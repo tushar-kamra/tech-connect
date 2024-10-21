@@ -22,12 +22,18 @@ app.use("/test", (req, res) => {
 
 // This will handle only GET requests to /user
 app.get("/user", (req, res) => {
+    console.log(req.query);
     res.send({ fname: "tushar", lname: "kamra" });
 });
 
 // This will handle only POST requests to /user
 app.post("/user", (req, res) => {
     res.send("POST req successful");
+});
+
+// dynamic routes
+app.get("/user/:userId", (req, res) => {
+    console.log(req.params);
 });
 
 app.listen(port, () => {
