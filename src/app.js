@@ -15,9 +15,19 @@ app.use("/test", (req, res) => {
 //     res.send("Homepage");
 // });
 
+// app.use("/user", (req, res, next) => {
+//     // res.send("user page");
+//     next();
+// });
+
 // This will handle only GET requests to /user
 app.get("/user", (req, res) => {
     res.send({ fname: "tushar", lname: "kamra" });
+});
+
+// This will handle only POST requests to /user
+app.post("/user", (req, res) => {
+    res.send("POST req successful");
 });
 
 app.listen(port, () => {
