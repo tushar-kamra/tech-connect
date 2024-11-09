@@ -53,3 +53,24 @@ app.use(
 app.listen(port, () => {
     console.log(`Server listening to port ${port}`);
 });
+
+/**
+ * Admin authorization middleware - 1
+ */
+app.use("/admin", (req, res, next) => {
+    const token = "xyz";
+    const isAdminAuthorized = token === "xysz";
+    if (isAdminAuthorized) {
+        next();
+    } else {
+        res.status(401).send("Unauthorized request");
+    }
+});
+
+app.use("/admin/deleteUser", (req, res) => {
+    res.send("User deleted");
+});
+
+app.use("/admin/addUser", (req, res) => {
+    res.send("User added");
+});
