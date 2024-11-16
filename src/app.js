@@ -11,11 +11,14 @@ connectDB().then(() => {
     });
 });
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", express.json(), async (req, res) => {
+    console.log(req.body);
+    res.send("api success");
+    return;
     const user = new User({
-        firstName: "Shivam",
-        lastName: "Kamra",
-        email: "shivam@techconnect.com",
+        firstName: "M",
+        lastName: "K",
+        email: "mk@techconnect.com",
         password: 123456,
         age: 27,
         city: "Delhi",
