@@ -76,6 +76,7 @@ app.patch("/user", async (req, res) => {
             req.body,
             {
                 returnedDocument: "after",
+                runValidators: true,
             }
         );
         console.log(user);
