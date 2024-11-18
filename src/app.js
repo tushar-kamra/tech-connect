@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const { validateSignUp } = require("./utils/validation");
 const app = express();
 const port = 2000;
 
@@ -17,6 +18,7 @@ app.post("/signup", express.json(), async (req, res) => {
     const user = new User(req.body);
 
     try {
+        validateSignUp(req);
         await user.save();
         res.send("User created successfully!");
     } catch (err) {
