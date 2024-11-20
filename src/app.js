@@ -6,6 +6,7 @@ const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { userAuth } = require("./middlewares/auth");
 const app = express();
 const port = 2000;
 
@@ -126,7 +127,9 @@ app.post("/login", async (req, res) => {
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (isPasswordCorrect) {
-            const token = jwt.sign({ _id: user._id }, "TechConnect@1234");
+            const token = jwt.sign({ _id: user._id }, "TechConnect@1234", {
+                expiresIn: 10,
+            });
             res.cookie("jwt-token", token);
             res.send("Login successful");
         } else {
@@ -137,24 +140,9 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
     try {
-        const cookies = req.cookies;
-
-        const { "jwt-token": jwtToken } = cookies;
-        if (!jwtToken) {
-            throw new Error("Invalid token");
-        }
-
-        const payload = jwt.verify(jwtToken, "TechConnect@1234");
-
-        const { _id } = payload;
-        const user = await User.findById(_id);
-        if (!user) {
-            throw new Error("Invalid user");
-        }
-
-        res.send(user);
+        res.send(req.user);
     } catch (err) {
         res.status(400).send("Something went wrong: " + err.message);
     }

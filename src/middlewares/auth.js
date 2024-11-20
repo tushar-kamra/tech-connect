@@ -1,24 +1,30 @@
-const adminAuth = (req, res, next) => {
-    const token = "xyz";
-    const isAdminAuthorized = token === "xyz";
-    if (isAdminAuthorized) {
-        next();
-    } else {
-        res.status(401).send("Unauthorized request");
-    }
-};
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-const userAuth = (req, res, next) => {
-    const token = "xyz";
-    const isUserAuthorized = token === "xyz";
-    if (isUserAuthorized) {
+const userAuth = async (req, res, next) => {
+    try {
+        const { "jwt-token": jwtToken } = req.cookies;
+        if (!jwtToken) {
+            throw new Error("Invalid jwt");
+        }
+
+        const payload = jwt.verify(jwtToken, "TechConnect@1234");
+        console.log(payload);
+        const { _id } = payload;
+
+        const user = await User.findById(_id);
+        if (!user) {
+            throw new Error("Invalid user");
+        }
+
+        req.user = user;
+
         next();
-    } else {
-        res.status(401).send("Unauthorized request");
+    } catch (err) {
+        res.status(401).send("Unauthorized request: " + err.message);
     }
 };
 
 module.exports = {
-    adminAuth,
     userAuth,
 };
