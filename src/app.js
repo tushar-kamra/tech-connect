@@ -3,6 +3,8 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignUp } = require("./utils/validation");
 const validator = require("validator");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const app = express();
 const port = 2000;
@@ -15,6 +17,7 @@ connectDB().then(() => {
 });
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", express.json(), async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
@@ -117,17 +120,41 @@ app.post("/login", async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        console.log(user);
         if (!user) {
             throw new Error("Invalid user");
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (isPasswordCorrect) {
+            const token = jwt.sign({ _id: user._id }, "TechConnect@1234");
+            res.cookie("jwt-token", token);
             res.send("Login successful");
         } else {
             res.send("Invalid credentials");
         }
+    } catch (err) {
+        res.status(400).send("Something went wrong: " + err.message);
+    }
+});
+
+app.get("/profile", async (req, res) => {
+    try {
+        const cookies = req.cookies;
+
+        const { "jwt-token": jwtToken } = cookies;
+        if (!jwtToken) {
+            throw new Error("Invalid token");
+        }
+
+        const payload = jwt.verify(jwtToken, "TechConnect@1234");
+
+        const { _id } = payload;
+        const user = await User.findById(_id);
+        if (!user) {
+            throw new Error("Invalid user");
+        }
+
+        res.send(user);
     } catch (err) {
         res.status(400).send("Something went wrong: " + err.message);
     }
