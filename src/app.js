@@ -125,11 +125,9 @@ app.post("/login", async (req, res) => {
             throw new Error("Invalid user");
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        const isPasswordCorrect = await user.validatePassword(password);
         if (isPasswordCorrect) {
-            const token = jwt.sign({ _id: user._id }, "TechConnect@1234", {
-                expiresIn: 10,
-            });
+            const token = await user.getJWT();
             res.cookie("jwt-token", token);
             res.send("Login successful");
         } else {
