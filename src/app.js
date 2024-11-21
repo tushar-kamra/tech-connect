@@ -4,6 +4,7 @@ const User = require("./models/user");
 const cookieParser = require("cookie-parser");
 const { userAuth } = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
 const app = express();
 const port = 2000;
 
@@ -16,7 +17,7 @@ connectDB().then(() => {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/", authRouter);
+app.use("/", authRouter, profileRouter);
 
 // get user by email
 app.get("/user", async (req, res) => {
@@ -88,5 +89,3 @@ app.patch("/user/:userId", async (req, res) => {
         res.status(400).send("Something went wrong: " + err.message);
     }
 });
-
-
