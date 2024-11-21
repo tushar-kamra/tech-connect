@@ -1,10 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const { validateSignUp } = require("./utils/validation");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const { userAuth } = require("./middlewares/auth");
 const authRouter = require("./routes/auth");
 const app = express();
@@ -92,10 +89,4 @@ app.patch("/user/:userId", async (req, res) => {
     }
 });
 
-app.get("/profile", userAuth, async (req, res) => {
-    try {
-        res.send(req.user);
-    } catch (err) {
-        res.status(400).send("Something went wrong: " + err.message);
-    }
-});
+
