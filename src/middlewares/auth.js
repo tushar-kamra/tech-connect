@@ -9,7 +9,6 @@ const userAuth = async (req, res, next) => {
         }
 
         const payload = jwt.verify(jwtToken, "TechConnect@1234");
-        console.log(payload);
         const { _id } = payload;
 
         const user = await User.findById(_id);
