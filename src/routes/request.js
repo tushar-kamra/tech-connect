@@ -23,13 +23,35 @@ requestRouter.post(
                 throw new Error("Invalid user");
             }
 
+            const alreadyConnected = await ConnectionRequest.findOne({
+                $or: [
+                    { fromUserId, toUserId },
+                    { fromUserId: toUserId, toUserId: fromUserId },
+                ],
+            });
+            if (alreadyConnected) {
+                return res
+                    .status(400)
+                    .send({ message: "Connection Request Already Sent!!" });
+            }
+
             const connectionRequest = new ConnectionRequest({
                 fromUserId,
                 toUserId,
                 status,
             });
-            await connectionRequest.save();
-            res.json({ message: ``, data: connectionRequest });
+
+            const data = await connectionRequest.save();
+
+            res.json({
+                message:
+                    req.user.firstName +
+                    " is " +
+                    status +
+                    " in " +
+                    toUser.firstName,
+                data,
+            });
         } catch (err) {
             res.status(400).send("Something went wrong: " + err.message);
         }
