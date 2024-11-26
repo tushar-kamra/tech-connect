@@ -24,25 +24,34 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
 userRouter.get("/user/connections", userAuth, async (req, res) => {
     const loggedInUserId = req.user._id;
 
-    const connectionRequests = await ConnectionRequest.find({
-        $or: [
-            { fromUserId: loggedInUserId, status: "accepted" },
-            { toUserId: loggedInUserId, status: "accepted" },
-        ],
-    })
-        .populate("fromUserId", ["firstName", "lastName", "about", "skills"])
-        .populate("toUserId", ["firstName", "lastName", "about", "skills"]);
+    try {
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { fromUserId: loggedInUserId, status: "accepted" },
+                { toUserId: loggedInUserId, status: "accepted" },
+            ],
+        })
+            .populate("fromUserId", [
+                "firstName",
+                "lastName",
+                "about",
+                "skills",
+            ])
+            .populate("toUserId", ["firstName", "lastName", "about", "skills"]);
 
-    const data = connectionRequests.map((row) => {
-        // if (row.fromUserId._id.equals(loggedInUserId)) {
-        if (row.fromUserId._id.toString() === loggedInUserId.toString()) {
-            return row.toUserId;
-        } else {
-            return row.fromUserId;
-        }
-    });
+        const data = connectionRequests.map((row) => {
+            // if (row.fromUserId._id.equals(loggedInUserId)) {
+            if (row.fromUserId._id.toString() === loggedInUserId.toString()) {
+                return row.toUserId;
+            } else {
+                return row.fromUserId;
+            }
+        });
 
-    res.json({ data });
+        res.json({ data });
+    } catch (err) {
+        res.status(400).send({ message: err.message });
+    }
 });
 
 module.exports = userRouter;
